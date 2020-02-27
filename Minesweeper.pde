@@ -34,9 +34,13 @@ public void draw ()
 }
 public boolean isWon()
 {
+	int flaggedMines = 0;
     for(int r = 0; r < NUM_ROWS; r++)
     	for(int c = 0; c < NUM_COLS; c++)
-
+    		if(mines.contains(buttons[r][c]) && buttons[r][c].isFlagged() == true)
+    			flaggedMines++;
+    if(flaggedMines == NUM_MINES)
+    	return true;
     return false;
 }
 public void displayLosingMessage()
@@ -88,13 +92,22 @@ public class MSButton
     {
         clicked = true;
         if(mouseButton == RIGHT)
+        {
         	flagged = !flagged;
+        	if(flagged == false)
+        	  clicked = false;
+        }
         else if(mines.contain(this))
         	displayLosingMessage();
         else if(countMines(myRow,myCol) > 0)
         	setLabel(countMines(myRow,myCol));
         else 
-			mousePressed();
+        {
+        	for(int r = myRow-1; r < myRow+2; r++)
+    			for(int c = myCol-1; c < myCol+2; c++)
+    				if(isValid(r,c) && flagged == false)
+    					if(r == myRow && c != myCol || r != myRow)
+    						button[r][c].mousePressed();
         }
     }
     public void draw() 
