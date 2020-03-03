@@ -1,9 +1,11 @@
 import de.bezier.guido.*;
-private int NUM_ROWS = 5;
-private int NUM_COLS = 5;
-private int NUM_MINES = 2;
+private int NUM_ROWS = 16;
+private int NUM_COLS = 16;
+private int NUM_MINES = 20;
 private MSButton[][] buttons; //2d array of minesweeper buttons
 private ArrayList <MSButton> mines = new ArrayList <MSButton>(); //ArrayList of just the minesweeper buttons that are mined
+private String losingMessage = new String("YOU LOSE");
+private String winningMessage = new String("YOU WIN");
 
 void setup()
 {
@@ -37,7 +39,7 @@ public boolean isWon()
 	int flaggedMines = 0;
     for(int r = 0; r < NUM_ROWS; r++)
     	for(int c = 0; c < NUM_COLS; c++)
-    		if(mines.contains(buttons[r][c]) && buttons[r][c].isFlagged() == true)
+    		if(mines.contains(buttons[r][c]) && buttons[r][c].isFlagged())
     			flaggedMines++;
     if(flaggedMines == NUM_MINES)
     	return true;
@@ -45,11 +47,16 @@ public boolean isWon()
 }
 public void displayLosingMessage()
 {
-    //your code here
+	noLoop();
+	for(int i = 0; i < mines.size(); i++)
+		mines.get(i).mousePressed();
+	for(int i = 0; i < 8; i++)
+		buttons[7][i+3].setLabel(losingMessage.substring())
 }
 public void displayWinningMessage()
 {
-    //your code here
+	noLoop();
+	buttons[3][3].setLabel("W");  
 }
 public boolean isValid(int r, int c)
 {
@@ -97,7 +104,7 @@ public class MSButton
         	if(flagged == false)
         	  clicked = false;
         }
-        else if(mines.contain(this))
+        else if(mines.contains(this))
         	displayLosingMessage();
         else if(countMines(myRow,myCol) > 0)
         	setLabel(countMines(myRow,myCol));
@@ -105,9 +112,8 @@ public class MSButton
         {
         	for(int r = myRow-1; r < myRow+2; r++)
     			for(int c = myCol-1; c < myCol+2; c++)
-    				if(isValid(r,c) && flagged == false)
-    					if(r == myRow && c != myCol || r != myRow)
-    						button[r][c].mousePressed();
+    				if(isValid(r,c) && !buttons[r][c].clicked)
+    						buttons[r][c].mousePressed();
         }
     }
     public void draw() 
