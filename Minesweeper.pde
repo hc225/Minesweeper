@@ -1,7 +1,7 @@
 import de.bezier.guido.*;
 private int NUM_ROWS = 16;
 private int NUM_COLS = 16;
-private int NUM_MINES = 20;
+private int NUM_MINES = 5;
 private MSButton[][] buttons; //2d array of minesweeper buttons
 private ArrayList <MSButton> mines = new ArrayList <MSButton>(); //ArrayList of just the minesweeper buttons that are mined
 private String losingMessage = new String("YOU LOSE");
@@ -36,27 +36,31 @@ public void draw ()
 }
 public boolean isWon()
 {
-	int flaggedMines = 0;
+	int count = 0;
     for(int r = 0; r < NUM_ROWS; r++)
     	for(int c = 0; c < NUM_COLS; c++)
-    		if(mines.contains(buttons[r][c]) && buttons[r][c].isFlagged())
-    			flaggedMines++;
-    if(flaggedMines == NUM_MINES)
+    		if(if buttons[r][c].isFlagged || buttons[r][c].isClicked())
+    			count++;
+    if(count == NUM_ROWS*NUM_COLS)
     	return true;
     return false;
 }
 public void displayLosingMessage()
 {
+    for(int r = 0; r < NUM_ROWS; r++)
+    	for(int c = 0; c < NUM_COLS; c++)
+    		if(mines.contains(buttons[r][c]) && !buttons[r][c].clicked)
+    			buttons[r][c].mousePressed();
+	for(int i = 0; i < losingMessage.length(); i++)
+		buttons[7][i+4].setLabel(losingMessage.substring(i,i+1));
 	noLoop();
-	for(int i = 0; i < mines.size(); i++)
-		mines.get(i).mousePressed();
-	for(int i = 0; i < 8; i++)
-		buttons[7][i+3].setLabel(losingMessage.substring())
 }
 public void displayWinningMessage()
 {
+	for(int r = 0; r < NUM_ROWS; r++)
+		for(int i = 0; i < winningMessage.length(); i++)
+			buttons[7][i+4].setLabel(winningMessage.substring(i,i+1)); 
 	noLoop();
-	buttons[3][3].setLabel("W");  
 }
 public boolean isValid(int r, int c)
 {
@@ -104,7 +108,7 @@ public class MSButton
         	if(flagged == false)
         	  clicked = false;
         }
-        else if(mines.contains(this))
+        else if(!flagged && mines.contains(this))
         	displayLosingMessage();
         else if(countMines(myRow,myCol) > 0)
         	setLabel(countMines(myRow,myCol));
@@ -142,6 +146,10 @@ public class MSButton
     public boolean isFlagged()
     {
         return flagged;
+    }
+    public boolean isClicked()
+    {
+    	return clicked;
     }
 }
 
