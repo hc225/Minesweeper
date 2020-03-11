@@ -139,7 +139,7 @@ public class MSButton
         	clicked = true;
         	for(int r = myRow-1; r < myRow+2; r++)
     			for(int c = myCol-1; c < myCol+2; c++)
-    				if(isValid(r,c) && !buttons[r][c].clicked)
+    				if(isValid(r,c) && !buttons[r][c].clicked && !buttons[r][c].flagged)
     						buttons[r][c].mousePressed();
         }
     }
