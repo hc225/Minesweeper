@@ -1,8 +1,9 @@
 import de.bezier.guido.*;
 public final static int NUM_ROWS = 16;
 public final static int NUM_COLS = 16;
-public final static int NUM_MINES = 16;
+public final static int NUM_MINES = 5;
 private boolean isLost = false;
+private boolean firstClick = false;
 private MSButton[][] buttons; //2d array of minesweeper buttons
 private ArrayList <MSButton> mines = new ArrayList <MSButton>(); //ArrayList of just the minesweeper buttons that are mined
 
@@ -15,7 +16,7 @@ void setup()
     for(int r = 0; r < NUM_ROWS; r++)
     	for(int c = 0; c < NUM_COLS; c++)
     		buttons[r][c] = new MSButton(r,c);    
-    setMines();
+
 }
 public void setMines()
 {
@@ -23,7 +24,7 @@ public void setMines()
 	{
 		int r = (int)(Math.random()*NUM_ROWS);
     	int c = (int)(Math.random()*NUM_COLS);
-    	if(!mines.contains(buttons[r][c]))
+    	if(!mines.contains(buttons[r][c]) && !buttons[r][c].isClicked())
     		mines.add(buttons[r][c]);
 	}
 }
@@ -34,12 +35,12 @@ public void draw ()
     {
     	displayLosingMessage();
         showAllMines();
-    	
+    	displayRestartMessage();
     }
     if(isWon() == true)
     {
         displayWinningMessage();
-      
+        displayRestartMessage();
     }
 }
 public boolean isWon()
@@ -59,21 +60,41 @@ public boolean isWon()
 }
 public void displayLosingMessage()
 {
-	String message = new String("YOU LOSE");
+	String message = "YOU LOSE";
 	for(int i = 0; i < message.length(); i++)
 	{
 		buttons[7][i+4].setLabel(message.substring(i,i+1));
-		buttons[7][i+4].labeledLetter = true;
+		buttons[7][i+4].resultLabel = true;
 	}
 }
 public void displayWinningMessage()
 {
-	String message = new String("YOU WIN");
+	String message = "YOU WIN";
 	for(int i = 0; i < message.length(); i++)
 	{
 		buttons[7][i+4].setLabel(message.substring(i,i+1)); 
-		buttons[7][i+4].labeledLetter = true;
+		buttons[7][i+4].resultLabel = true;
 	}
+}
+public void displayRestartMessage()
+{
+    String message = "CLICK TO RESTART";
+    for(int i = 0; i < message.length(); i++) 
+        if(i < 5)
+        {
+            buttons[10][i+5].setLabel(message.substring(i,i+1));
+            buttons[10][i+5].restartLabel = true; 
+        }
+        else if(i >= 5 && i < 9)
+        {
+            buttons[11][i+1].setLabel(message.substring(i,i+1));
+            buttons[11][i+1].restartLabel = true;
+        }
+        else  
+        {
+            buttons[12][i-5].setLabel(message.substring(i,i+1));
+            buttons[12][i-5].restartLabel = true;   
+        }     
 }
 public void showAllMines()
 {
@@ -85,6 +106,7 @@ public void showAllMines()
 public void newGame()
 {
     isLost = false;
+    firstClick = false;
     for(int r = 0; r < NUM_ROWS; r++)
         for(int c = 0; c < NUM_COLS; c++)
         {
@@ -92,10 +114,10 @@ public void newGame()
                 mines.remove(buttons[r][c]);
             buttons[r][c].clicked = false;
             buttons[r][c].flagged = false;
-            buttons[r][c].labeledLetter = false; 
+            buttons[r][c].restartLabel = false; 
+            buttons[r][c].resultLabel = false; 
             buttons[r][c].myLabel = "";   
         }
-    setMines();
 }
 public boolean isValid(int r, int c)
 {
@@ -115,7 +137,8 @@ public class MSButton
 {
     private int myRow, myCol;
     private float x,y, width, height;
-    private boolean clicked, flagged, labeledLetter;
+    private boolean clicked, flagged;
+    private boolean resultLabel, restartLabel; //to set different style for messages
     private String myLabel;
     
     public MSButton(int row, int col)
@@ -134,6 +157,13 @@ public class MSButton
     // called by manager
     public void mousePressed() 
     {
+        if(!firstClick)
+        {
+            firstClick = true;
+            clicked = true;
+            setMines();
+        }
+
         if(isWon() || isLost)
             newGame();
         else if(!clicked && mouseButton == RIGHT)
@@ -174,10 +204,15 @@ public class MSButton
         rect(x, y, width, height);
         fill(0);
         textSize(12);
-        if(labeledLetter)
+        if(resultLabel)
         {
         	fill(0,0,255);
         	textSize(24);
+        }
+        if(restartLabel)
+        {
+            fill(0,0,255);
+            textSize(16);
         }
         text(myLabel,x+width/2,y+height/2);
     }
